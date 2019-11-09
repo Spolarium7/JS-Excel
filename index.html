@@ -1,0 +1,69 @@
+<html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jexcel/2.1.0/js/jquery.jexcel.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jexcel/2.1.0/css/jquery.jexcel.min.css" type="text/css" />
+
+<div id="my"></div>
+
+<button onclick="addQuiz()">Add</button>
+<script>
+var quizzes = 0;
+handler = function(obj, cell, val) {
+    console.log('My table id: ' + $(obj).prop('id'));
+    console.log('Cell changed: ' + $(cell).prop('id'));
+    console.log('Value: ' + val);
+};
+
+data = [
+    ['','QUIZ TOTAL'],
+    ['Jace Beleren',''],
+    ['Liliana Vess',''],
+    ['Koth Hammer',''],
+];
+
+$('#my').jexcel(
+	{ 
+		data:data, 
+		colWidths: [ 200, 105 ],
+		onchange:handler,
+		nestedHeaders:[
+			[
+				{ title:'CSM GRADING SHEET', colspan:'3' },
+			],
+			[
+				{ title:'STUDENT NAME', colspan:'1' },
+				{ title:'QUIZZES', colspan:'2' }
+			],
+		],
+	});
+$(
+
+function download(){
+	$('#my').jexcel('download');
+}
+
+function addQuiz(){
+	quizzes = quizzes + 1;	
+	$('#my').jexcel('insertColumn', 1, null, quizzes);
+	$('#my').jexcel('setMeta', numToAlpha(quizzes) + '1', 'name', 'quiz' + quizzes);
+	$('#my').jexcel('setValue', numToAlpha(quizzes + 1) + '1', 'Q' + quizzes);
+
+}
+
+function numToAlpha(num){
+	if(num < 27){
+		return String.fromCharCode(64 + num);
+	}
+	else{
+		var mult = Math.floor(num/26);
+		var rem = num%26
+		
+		return String.fromCharCode(64 + mult) + String.fromCharCode(64 + rem);
+	}
+}
+
+
+//
+</script>
+</html>

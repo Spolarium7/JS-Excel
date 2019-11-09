@@ -1,0 +1,88 @@
+<html>
+<script src="https://bossanova.uk/jexcel/v3/jexcel.js"></script>
+<link rel="stylesheet" href="https://bossanova.uk/jexcel/v3/jexcel.css" type="text/css" />
+<script src="https://bossanova.uk/jsuites/v2/jsuites.js"></script>
+<link rel="stylesheet" href="https://bossanova.uk/jsuites/v2/jsuites.css" type="text/css" />
+
+<div id="grSheet"></div>
+
+<button onclick="addGroup()">Add Quiz</button>
+<script>
+var quizzes = 0;
+
+data = [
+	['','','50'],
+    ['','QUIZ TOTAL','QUIZ POINTS'],
+	['','0',''],
+    ['Jace Beleren','',''],
+    ['Liliana Vess','',''],
+    ['Koth Hammer','',''],
+];
+
+table = jexcel(document.getElementById('grSheet'), {
+    data:data,
+	colWidths: [ 200, 105, 105 ],
+	onchange:	function(instance, cell, x, y, value) {
+		var cellName = jexcel.getColumnNameFromId([x,y]);
+		var meta = table.getMeta(cellName);
+
+		if(meta){
+			if(meta.name.includes("_items")){
+				groupTotal(parseFloat(y));
+			};			
+			console.log('New change on cell ' + meta.name + ' to: ' + value + '');
+		}
+	},
+    nestedHeaders:[
+        [
+            { title:'CSM GRADING SHEET', colspan:'3' },
+        ],
+        [
+            { title:'STUDENT NAME', colspan:'1' },
+            { title:'QUIZZES', colspan:'2' }
+        ]
+    ],
+});
+
+
+function addGroup(){
+	var coord = numToAlpha(quizzes) + '2';
+	table.insertColumn(1, quizzes, false, null);
+	table.setMeta(coord, 'name', 'quiz' + quizzes);
+	var headerCoord = numToAlpha(quizzes + 2) + '2';
+	var itemCoord = numToAlpha(quizzes + 2) + '3';
+	quizzes = quizzes + 1;	
+	table.setValue(headerCoord, 'Q' + quizzes);
+	table.setValue(itemCoord, '10');
+	table.setMeta(itemCoord, 'name', 'quiz' + quizzes + '_items');
+	groupTotal(2);
+}
+
+function groupTotal(rowNum){
+	var data = table.getRowData(rowNum);
+	var totalCoord = numToAlpha(quizzes + 2) + (rowNum + 1);
+
+	var sum = 0;
+
+	for(let i = 0; i < (data.length-2); i++){
+		if(!isNaN(parseFloat(data[i]))){
+			sum = sum + parseFloat(data[i]);
+		}
+	}
+
+	table.setValue(totalCoord, sum);
+}
+
+
+function numToAlpha(num){
+	if(num < 27){
+		return String.fromCharCode(64 + num);
+	}
+	else{
+		var mult = Math.floor(num/26);
+		var rem = num%26
+		
+		return String.fromCharCode(64 + mult) + String.fromCharCode(64 + rem);
+	}
+}
+</script>
